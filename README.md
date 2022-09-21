@@ -17,8 +17,6 @@
 
 - [About](#about)
 - [Getting Started](#getting-started)
-- [Usage](#usage)
-- [Roadmap](#roadmap)
 - [Support](#support)
 - [Project assistance](#project-assistance)
 - [Contributing](#contributing)
