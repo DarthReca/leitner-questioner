@@ -1,7 +1,6 @@
-<div align="center">
+<h1 align="center">
   Leitner Questioner
-  <br />
-</div>
+</h1>
 
 <div align="center">
 <br />
