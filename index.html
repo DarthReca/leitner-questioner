@@ -10,16 +10,20 @@
     />
     <title>Leitner Questioner</title>
   </head>
-  <body>
-    <div class="container">
+  <body onload="MakeFilesUI()">
+    <div class="container-fluid">
       <!-- FILES -->
-      <div class="row">Select the box files before continue</div>
+      <div class="row py-2 justify-content-center" id="warning">
+        <div class="col-3 alert alert-warning text-center">
+          Select the box files
+        </div>
+      </div>
 
       <div class="row" id="files"></div>
       <!-- CARDS -->
       <div class="row" id="cards" hidden></div>
 
-      <div class="row justify-content-center">
+      <div class="row justify-content-center pt-2" id="save-area" hidden>
         <button class="col-2 btn btn-primary" onclick="SaveFiles()">
           Save
         </button>

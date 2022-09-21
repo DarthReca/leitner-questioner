@@ -1,12 +1,13 @@
 // GLOBAL
 let boxes = [];
 let currentQuestion = [];
-let expectedBoxes = 2;
+let expectedBoxes = 3;
 
+// PROTOTYPES
 const htmlFile = (i) =>
-  `<div class='col input-group'> \
+  `<div class='col gx-5 input-group'> \
   <label class='input-group-text' for='box${i}'>Box${i}</label> \
-  <input class='form-control' type='file' id='box1' onchange='ParseFiles(this, ${i})' accept='.txt'/>\
+  <input class='form-control' type='file' id='box1' onchange='ParseFiles(this, ${i})' accept='.csv'/>\
   </div>`;
 
 const htmlCard = (i) =>
@@ -42,18 +43,12 @@ const htmlCard = (i) =>
 </div>
 </div> `;
 
-MakeFilesUI();
-
 // FUNCTIONS
 function MakeFilesUI() {
   document.getElementById("files").innerHTML = Array.from(
     { length: expectedBoxes },
     (v, k) => htmlFile(k)
-  );
-}
-
-function AddCard() {
-  document.getElementById("cards").innerHTML += htmlCard(boxes.length - 1);
+  ).join("");
 }
 
 function ParseFiles(input, index) {
@@ -62,16 +57,22 @@ function ParseFiles(input, index) {
   reader.onload = () => {
     boxes[index] = reader.result
       .trim()
-      .split("\r\n")
+      .replaceAll("\r", "")
+      .split("\n")
+      .filter((x) => x.length > 0)
       .map((x) => x.split(",", 2))
       .map((x) => ({
         question: x[0],
         answer: x.length == 2 ? x[1] : "",
       }));
     currentQuestion[index] = -1;
-    document.getElementById("cards").hidden = boxes.length !== expectedBoxes;
-    document.getElementById("files").hidden = boxes.length === expectedBoxes;
-    AddCard();
+    let cards = document.getElementById("cards");
+    let ready = boxes.length === expectedBoxes;
+    cards.hidden = !ready;
+    document.getElementById("files").hidden = ready;
+    document.getElementById("warning").hidden = ready;
+    document.getElementById("save-area").hidden = !ready;
+    cards.innerHTML += htmlCard(boxes.length - 1);
   };
 }
 
@@ -101,18 +102,18 @@ function TakeQuestion(box) {
 }
 
 function ShowAnswer(box) {
-  let card = document.getElementById(`box${box + 1}-card`);
+  let card = document.getElementById(`box${box}-card`);
   card.getElementsByClassName("answer")[0].hidden = false;
 }
 
 function MoveToBox(box, amount) {
   let toMove = boxes[box].splice(currentQuestion[box], 1);
-  boxes[clamp(box + amount, 0, boxes.length - 1)].push(toMove);
+  boxes[clamp(box + amount, 0, boxes.length - 1)].push(...toMove);
   activateMoveButtons(document.getElementById(`box${box}-card`), false);
 }
 
 function SaveFiles() {
-  let links = document.getElementById("downloads");
+  // Map each box to a files in csv format
   let files = boxes.map(
     (x) =>
       new Blob(
@@ -123,7 +124,7 @@ function SaveFiles() {
   let buttons = boxes.map((x) => document.createElement("a"));
   buttons.forEach((x, i) => {
     x.href = URL.createObjectURL(files[i]);
-    x.download = `box${i}.txt`;
+    x.download = `box${i}.csv`;
     x.click();
     setTimeout(() => window.URL.revokeObjectURL(x.href), 0);
   });
